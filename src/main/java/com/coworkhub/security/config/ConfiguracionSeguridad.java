@@ -46,6 +46,7 @@ public class ConfiguracionSeguridad {
                 .sessionManagement(sesion -> sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(autorizacion -> autorizacion
                         // Públicos: login y documentación
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/auth/login", "/doc/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // Catálogos: cualquier usuario autenticado los lee; solo ADMIN los modifica (RN-13)
                         .requestMatchers(HttpMethod.GET, CATALOGOS).authenticated()

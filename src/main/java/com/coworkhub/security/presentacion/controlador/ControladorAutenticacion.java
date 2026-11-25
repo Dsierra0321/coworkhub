@@ -27,12 +27,25 @@ public class ControladorAutenticacion {
     private final AuthenticationManager authenticationManager;
     private final ServicioDetallesUsuario servicioDetallesUsuario;
     private final UtilJwt utilJwt;
+    private final com.coworkhub.persistence.repository.RepositorioMiembros repositorioMiembros;
 
     public ControladorAutenticacion(AuthenticationManager authenticationManager,
-                                    ServicioDetallesUsuario servicioDetallesUsuario, UtilJwt utilJwt) {
+                                    ServicioDetallesUsuario servicioDetallesUsuario, UtilJwt utilJwt,
+                                    com.coworkhub.persistence.repository.RepositorioMiembros repositorioMiembros) {
         this.authenticationManager = authenticationManager;
         this.servicioDetallesUsuario = servicioDetallesUsuario;
         this.utilJwt = utilJwt;
+        this.repositorioMiembros = repositorioMiembros;
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/me")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
+    public java.util.Map<String, Object> me(org.springframework.security.core.Authentication auth) {
+        java.util.Map<String, Object> datos = new java.util.HashMap<>();
+        datos.put("nombreUsuario", auth.getName());
+        datos.put("rol", auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", ""));
+        repositorioMiembros.findByUsuarioNombreUsuario(auth.getName()).ifPresent(m -> datos.put("miembroId", m.getId()));
+        return datos;
     }
 
     @Operation(summary = "Iniciar sesión",
