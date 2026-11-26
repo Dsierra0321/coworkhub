@@ -1,0 +1,739 @@
+{
+  "info": {
+    "name": "CoWorkHub - 14 pruebas propuestas",
+    "description": "Basada en el backend actual. No equivale a la tabla oficial no disponible. Ejecutar desde una base de prueba recién inicializada con reloj fijo 2030-06-03T08:00:00, en orden, una vez.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "recepToken",
+      "value": ""
+    },
+    {
+      "key": "memberToken",
+      "value": ""
+    },
+    {
+      "key": "andes",
+      "value": ""
+    },
+    {
+      "key": "caribe",
+      "value": ""
+    },
+    {
+      "key": "inactiva",
+      "value": ""
+    },
+    {
+      "key": "anaId",
+      "value": ""
+    },
+    {
+      "key": "martaId",
+      "value": ""
+    },
+    {
+      "key": "sofiaId",
+      "value": ""
+    },
+    {
+      "key": "reservaId",
+      "value": ""
+    },
+    {
+      "key": "tardiaId",
+      "value": ""
+    },
+    {
+      "key": "cortaId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Preparación (ejecutar primero)",
+      "item": [
+        {
+          "name": "Login admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"admin\",\n  \"contrasena\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"adminToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login recepcion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"recepcion\",\n  \"contrasena\": \"recep123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"recepToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login ana",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"ana\",\n  \"contrasena\": \"ana123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"memberToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Identificar salas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/salas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) { const rows=pm.response.json(); for (const [name,key] of [[\"Sala Andes\",\"andes\"],[\"Sala Caribe\",\"caribe\"],[\"Escritorio B1\",\"inactiva\"]]) { const row=rows.find(x=>x.nombre===name); pm.expect(row).to.exist; pm.collectionVariables.set(key,row.id); } }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Identificar miembros",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/miembros"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) { const rows=pm.response.json(); for (const [doc,key] of [[\"1010101\",\"anaId\"],[\"3030303\",\"martaId\"],[\"5050505\",\"sofiaId\"]]) { const row=rows.find(x=>String(x.documento)===doc); pm.expect(row).to.exist; pm.collectionVariables.set(key,row.id); } }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Crear reserva válida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"miembroId\": {{anaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-10T10:00:00\",\n  \"fin\": \"2030-06-10T11:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"reservaId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - RN-01 cruce de horario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"miembroId\": {{anaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-10T10:00:00\",\n  \"fin\": \"2030-06-10T11:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"RN-01\",()=>pm.expect(pm.response.json().codigo).to.eql(\"RN-01\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - RN-02 duración menor a 30 minutos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"miembroId\": {{anaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-11T10:00:00\",\n  \"fin\": \"2030-06-11T10:15:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Código RN-02\", function () { pm.expect(pm.response.json().codigo).to.eql(\"RN-02\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - RN-03 anticipación insuficiente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"miembroId\": {{anaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-03T08:30:00\",\n  \"fin\": \"2030-06-03T09:30:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Código RN-03\", function () { pm.expect(pm.response.json().codigo).to.eql(\"RN-03\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - RN-04 sala inactiva",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"miembroId\": {{anaId}},\n  \"salaId\": {{inactiva}},\n  \"inicio\": \"2030-06-10T10:00:00\",\n  \"fin\": \"2030-06-10T11:00:00\",\n  \"asistentes\": 1,\n  \"servicios\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Código RN-04\", function () { pm.expect(pm.response.json().codigo).to.eql(\"RN-04\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - RN-05 miembro suspendido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"miembroId\": {{sofiaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-10T10:00:00\",\n  \"fin\": \"2030-06-10T11:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Código RN-05\", function () { pm.expect(pm.response.json().codigo).to.eql(\"RN-05\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - RN-08 cancelar con más de 24h",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas/{{reservaId}}/cancelar"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Sin cargo y devuelve minutos\",()=>{const r=pm.response.json();pm.expect(r.estado).to.eql(\"CANCELADA\");pm.expect(Number(r.cargoCancelacion)).to.eql(0);pm.expect(r.minutosConsumidos).to.eql(0);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - RN-08 cancelar entre 2 y 24 horas",
+      "item": [
+        {
+          "name": "Preparar reserva Flex",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"miembroId\": {{martaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-03T12:00:00\",\n  \"fin\": \"2030-06-03T13:00:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set(\"tardiaId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar con cargo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{tardiaId}}/cancelar"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Cargo del 50%\",()=>{const r=pm.response.json();pm.expect(r.estado).to.eql(\"CANCELADA\");pm.expect(Number(r.cargoCancelacion)).to.eql(10);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 - RN-08 impedir cancelación con menos de 2h",
+      "item": [
+        {
+          "name": "Preparar reserva a 90 minutos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"miembroId\": {{anaId}},\n  \"salaId\": {{caribe}},\n  \"inicio\": \"2030-06-03T09:30:00\",\n  \"fin\": \"2030-06-03T10:30:00\",\n  \"asistentes\": 2,\n  \"servicios\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set(\"cortaId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rechazar cancelación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservas/{{cortaId}}/cancelar"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Código RN-08\", function () { pm.expect(pm.response.json().codigo).to.eql(\"RN-08\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10 - RN-13 miembro consulta sus reservas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{memberToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas?miembroId={{anaId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Solo reservas propias\",()=>{pm.response.json().forEach(r=>pm.expect(String(r.miembro.id)).to.eql(String(pm.collectionVariables.get(\"anaId\"))));});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - RN-13 miembro no consulta otro miembro",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{memberToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/reservas?miembroId={{martaId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - RN-13 recepción no modifica catálogo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{recepToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/sedes",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Acceso sin token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/salas"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 - Consultar consumo mensual propio",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{memberToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/miembros/{{anaId}}/consumo?mes=2030-06"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Consumo del miembro y mes solicitados\",()=>{const r=pm.response.json();pm.expect(String(r.miembroId)).to.eql(String(pm.collectionVariables.get(\"anaId\")));pm.expect(r.mes).to.eql(\"2030-06\");});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
